@@ -10,25 +10,20 @@ class UnitConverter:
             Unit.FAHRENHEIT: self._to_fahrenheit,
         }
 
-    @property
-    def dest_unit(self):
-        return self._dest_unit
-
-    @dest_unit.setter
-    def dest_unit(self, dest_unit):
-        self._dest_unit = dest_unit
-
     def convert(self, temp):
+
         try:
             temperature = float(temp)
         except ValueError:
             return 0
 
-        if (self.dest_unit == self._parser_default_unit or self.dest_unit is None):
+        if (self.dest_unit == self._parser_default_unit or
+            self.dest_unit is None):
             return self._format_results(temperature)
 
         func = self._convert_functions[self.dest_unit]
         result = func(temperature)
+
         return self._format_results(result)
 
     def _format_results(self, value):

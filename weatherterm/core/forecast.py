@@ -14,7 +14,6 @@ class Forecast:
             forecast_date=None,
             forecast_type=ForecastType.TODAY):
         self._current_temp = current_temp
-
         self._high_temp = high_temp
         self._low_temp = low_temp
         self._humidity = humidity
@@ -62,6 +61,7 @@ class Forecast:
         else:
             temperature = (f'{offset}High {self._high_temp}\xb0 / '
                            f'Low {self._low_temp}\xb0 ')
+
         return (f'>> {self.forecast_date}\n'
                 f'{temperature}'
                 f'({self._description})\n'
