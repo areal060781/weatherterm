@@ -6,18 +6,20 @@ from weatherterm.core import Forecast
 from weatherterm.core import Request
 from weatherterm.core import Unit
 from weatherterm.core import UnitConverter
+from weatherterm.core import Mapper
 
 from bs4 import BeautifulSoup
 
 
 class WeatherComParser:
+
     def __init__(self):
         self._forecast = {
             ForecastType.TODAY: self._today_forecast,
             ForecastType.FIVEDAYS: self._five_and_ten_days_forecast,
             ForecastType.TENDAYS: self._five_and_ten_days_forecast,
             ForecastType.WEEKEND: self._weekend_forecast,
-        }
+            }
 
         self._base_url = 'http://weather.com/weather/{forecast}/l/{area}'
         self._request = Request(self._base_url)
@@ -153,7 +155,29 @@ class WeatherComParser:
         return self._prepare_data(results, args)
 
     def _weekend_forecast(self, args):
-        raise NotImplementedError()
+        criteria = {
+            'weather-cell': 'header',
+            'temp': 'p',
+            'weather-phrase': 'h3',
+            'wind-conditions': 'p',
+            'humidity': 'p',
+        }
+
+        mapper = Mapper()
+        mapper.remap_key('wind-conditions', 'wind')
+        mapper.remap_key('weather-phrase', 'description')
+
+        content = self._request.fetch_data(args.forecast_option.value,
+                                           args.area_code)
+
+        bs = BeautifulSoup(content, 'html.parser')
+        forecast_data = bs.find('section', class_='ls-mod')
+        container = forecast_data.div.div
+
+        partial_results = self._parse(container, criteria)
+        results = mapper.remap(partial_results)
+
+        return self._prepare_data(results, args)
 
     def run(self, args):
         self._forecast_type = args.forecast_option
