@@ -148,7 +148,9 @@ class WeatherComParser:
         return [td_forecast]
 
     def _five_and_ten_days_forecast(self, args):
-        raise NotImplementedError()
+        content = self._request.fetch_data(args.forecast_option.value, args.area_code)
+        results = self._parse_list_forecast(content, args)
+        return self._prepare_data(results, args)
 
     def _weekend_forecast(self, args):
         raise NotImplementedError()
